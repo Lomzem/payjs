@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wxt",
-    "build": "wxt build",
+    "build": "wxt build -b chrome && wxt build -b firefox",
     "zip": "wxt zip",
     "compile": "wxt prepare && svelte-check --tsconfig ./tsconfig.json",
     "lint": "eslint .",
