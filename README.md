@@ -4,22 +4,27 @@ Small browser extension for filling Paychex timecard rows from a date range and 
 
 ## Setup
 
+Requires `npm` or `bun`.
+
 ```sh
-bun install
+npm install
 ```
 
 ## Development
 
 ```sh
-bun run dev
+npm run dev
 ```
 
-Load the generated development extension from `.output/` in your browser.
+Load the generated development extension from `.output/`:
+
+- Chrome: open `chrome://extensions`, enable Developer mode, click `Load unpacked`, and select `.output/chrome-mv3`.
+- Firefox: open `about:debugging#/runtime/this-firefox`, click `Load Temporary Add-on`, and select the manifest file in `.output/firefox-mv2`.
 
 ## Build
 
 ```sh
-bun run build
+npm run build
 ```
 
 ## Usage
