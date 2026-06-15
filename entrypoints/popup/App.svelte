@@ -94,7 +94,7 @@
   }
 </script>
 
-<main class="w-80 space-y-4 p-4">
+<main class="h-130 w-96 space-y-4 p-4">
   <div class="space-y-1">
     <h1 class="text-base font-semibold">Paychex Timecard</h1>
     <p class="text-xs text-muted-foreground">

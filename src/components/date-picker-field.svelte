@@ -64,7 +64,7 @@
         </Button>
       {/snippet}
     </Popover.Trigger>
-    <Popover.Content class="w-auto p-0" align="start">
+    <Popover.Content class="w-auto p-0" align="start" side="bottom" avoidCollisions={false}>
       <Calendar
         bind:value={calendarValue}
         type="single"
