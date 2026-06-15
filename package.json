@@ -1,0 +1,41 @@
+{
+  "name": "payjs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "compile": "wxt prepare && svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@internationalized/date": "^3.12.0",
+    "@wxt-dev/module-svelte": "latest",
+    "bits-ui": "^2.16.3",
+    "clsx": "latest",
+    "lucide-svelte": "latest",
+    "tailwind-merge": "latest",
+    "tailwind-variants": "^3.2.2",
+    "wxt": "latest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@lucide/svelte": "^1.18.0",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "@tailwindcss/vite": "latest",
+    "eslint": "^10.5.0",
+    "eslint-plugin-svelte": "^3.19.0",
+    "prettier": "^3.8.4",
+    "prettier-plugin-svelte": "^4.1.1",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "svelte": "latest",
+    "svelte-check": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "typescript-eslint": "^8.61.1"
+  }
+}
