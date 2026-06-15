@@ -4,7 +4,14 @@ Small browser extension for filling Paychex timecard rows from a date range and 
 
 ## Setup
 
-Requires `npm` or `bun`.
+Clone the repo:
+
+```bash
+git clone https://github.com/Lomzem/payjs.git
+cd payjs
+```
+
+Requires [`npm`](https://nodejs.org/en/download/) or [`bun`](https://bun.com/docs/installation) (if you're cool 😎).
 
 ```sh
 npm install
@@ -16,16 +23,16 @@ npm install
 npm run dev
 ```
 
-Load the generated development extension from `.output/`:
-
-- Chrome: open `chrome://extensions`, enable Developer mode, click `Load unpacked`, and select `.output/chrome-mv3`.
-- Firefox: open `about:debugging#/runtime/this-firefox`, click `Load Temporary Add-on`, and select the manifest file in `.output/firefox-mv2`.
-
-## Build
+## Build and Installation
 
 ```sh
 npm run build
 ```
+
+Load the generated development extension from `.output/`:
+
+- Chrome: open `chrome://extensions`, enable Developer mode, click `Load unpacked`, and select `.output/chrome-mv3`.
+- Firefox: open `about:debugging#/runtime/this-firefox`, click `Load Temporary Add-on`, and select the manifest file in `.output/firefox-mv2`.
 
 ## Usage
 
