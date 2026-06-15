@@ -17,12 +17,6 @@ Requires [`npm`](https://nodejs.org/en/download/) or [`bun`](https://bun.com/doc
 npm install
 ```
 
-## Development
-
-```sh
-npm run dev
-```
-
 ## Build and Installation
 
 ```sh
