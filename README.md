@@ -33,9 +33,11 @@ Load the generated development extension from `.output/`:
 1. Open Paychex at `myapps.paychex.com`.
 2. Go to the correct timecard pay period.
 3. Open the extension popup.
-4. Choose start date, end date, and project code.
+4. Confirm or adjust the start date and end date, then enter the project code.
 5. Click `Fill`.
 6. Manually verify the timecard before submitting.
+
+When the popup opens, it reads the currently selected Paychex pay period from the timecard page and defaults the start and end dates to that full range. The date pickers only allow dates inside that active pay period; dates before or after it are disabled and cannot be submitted.
 
 ## Assumptions
 
@@ -43,7 +45,8 @@ Load the generated development extension from `.output/`:
 - Hours are hardcoded to `8`.
 - One project code is used per run.
 - Missing date rows are skipped.
-- The user is already on the correct pay period.
+- The user is already on the correct Paychex pay period before opening the popup.
+- The selected fill range must stay within the currently selected Paychex pay period.
 
 ## Troubleshooting
 
