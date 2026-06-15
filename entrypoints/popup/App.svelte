@@ -137,7 +137,7 @@
       <p class="text-sm text-destructive">{errorMessage}</p>
     {/if}
 
-    <Button class="w-full" type="submit" disabled={!canFill}>
+    <Button class="w-full cursor-pointer" type="submit" disabled={!canFill}>
       {status === "filling" ? "Filling..." : "Fill"}
     </Button>
   </form>

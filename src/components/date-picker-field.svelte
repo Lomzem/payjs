@@ -21,6 +21,7 @@
   let { id, label, value = $bindable() }: Props = $props();
 
   const formatter = new DateFormatter("en-US", { dateStyle: "medium" });
+  let open = $state(false);
   let calendarValue = $state<DateValue | undefined>(fromIsoDate(value));
 
   $effect(() => {
@@ -33,6 +34,7 @@
   function selectDate(selected: DateValue | undefined) {
     calendarValue = selected;
     value = selected?.toString() ?? "";
+    open = false;
   }
 
   function fromIsoDate(isoDate: string) {
@@ -44,14 +46,14 @@
 
 <div class="space-y-1.5">
   <Label for={id}>{label}</Label>
-  <Popover.Root>
+  <Popover.Root bind:open>
     <Popover.Trigger {id}>
       {#snippet child({ props })}
         <Button
           {...props}
           variant="outline"
           class={cn(
-            "h-10 w-full justify-start text-left font-normal",
+            "h-10 w-full cursor-pointer justify-start text-left font-normal",
             !calendarValue && "text-muted-foreground",
           )}
         >
