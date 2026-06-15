@@ -7,7 +7,9 @@
   import { compareIsoDates, isIsoDate } from "$lib/dates";
   import {
     FILL_TIMECARD_MESSAGE,
+    GET_PAY_PERIOD_MESSAGE,
     type FillTimecardResult,
+    type GetPayPeriodResult,
   } from "$lib/messages";
   import { getTimecardSettings, setTimecardSettings } from "$lib/storage";
 
@@ -17,9 +19,11 @@
   let status = $state<"idle" | "filling" | "complete" | "error">("idle");
   let errorMessage = $state("");
   let isPaychexTab = $state(false);
+  let payPeriodStartDate = $state("");
+  let payPeriodEndDate = $state("");
 
   const validationError = $derived(
-    validateForm(startDate, endDate, projectCode),
+    validateForm(startDate, endDate, projectCode, payPeriodStartDate, payPeriodEndDate),
   );
   const canFill = $derived(
     isPaychexTab && !validationError && status !== "filling",
@@ -27,14 +31,36 @@
 
   onMount(async () => {
     const settings = await getTimecardSettings();
-    startDate = settings.startDate;
-    endDate = settings.endDate;
     projectCode = settings.projectCode;
-    isPaychexTab = await activeTabIsPaychex();
+
+    const tab = await getActiveTab();
+    isPaychexTab = activeTabIsPaychex(tab);
+
+    if (isPaychexTab && tab.id) {
+      try {
+        const payPeriod = await getPayPeriod(tab.id);
+        payPeriodStartDate = payPeriod.startDate;
+        payPeriodEndDate = payPeriod.endDate;
+        startDate = payPeriod.startDate;
+        endDate = payPeriod.endDate;
+      } catch (error) {
+        status = "error";
+        errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Could not read Paychex pay period.";
+      }
+    }
   });
 
   async function fill() {
-    const currentError = validateForm(startDate, endDate, projectCode);
+    const currentError = validateForm(
+      startDate,
+      endDate,
+      projectCode,
+      payPeriodStartDate,
+      payPeriodEndDate,
+    );
     if (currentError) {
       status = "error";
       errorMessage = currentError;
@@ -53,10 +79,7 @@
     await setTimecardSettings(settings);
 
     try {
-      const [tab] = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
+      const tab = await getActiveTab();
       if (!tab.id) throw new Error("Open Paychex and try again.");
 
       const result = (await browser.tabs.sendMessage(tab.id, {
@@ -76,17 +99,54 @@
     }
   }
 
-  async function activeTabIsPaychex() {
+  async function getActiveTab() {
     const [tab] = await browser.tabs.query({
       active: true,
       currentWindow: true,
     });
+    return tab;
+  }
+
+  function activeTabIsPaychex(tab: Awaited<ReturnType<typeof getActiveTab>>) {
     return tab.url?.startsWith("https://myapps.paychex.com/") ?? false;
   }
 
-  function validateForm(start: string, end: string, code: string) {
+  async function getPayPeriod(tabId: number) {
+    const result = (await browser.tabs.sendMessage(tabId, {
+      type: GET_PAY_PERIOD_MESSAGE,
+    })) as GetPayPeriodResult;
+
+    if (!result?.ok) {
+      throw new Error(result?.error || "Could not read Paychex pay period.");
+    }
+
+    return result;
+  }
+
+  function validateForm(
+    start: string,
+    end: string,
+    code: string,
+    payPeriodStart: string,
+    payPeriodEnd: string,
+  ) {
     if (!isIsoDate(start)) return "Choose a start date.";
     if (!isIsoDate(end)) return "Choose an end date.";
+    if (!isIsoDate(payPeriodStart) || !isIsoDate(payPeriodEnd)) {
+      return "Could not read Paychex pay period.";
+    }
+    if (
+      compareIsoDates(start, payPeriodStart) < 0 ||
+      compareIsoDates(start, payPeriodEnd) > 0
+    ) {
+      return "Start date must be in the current pay period.";
+    }
+    if (
+      compareIsoDates(end, payPeriodStart) < 0 ||
+      compareIsoDates(end, payPeriodEnd) > 0
+    ) {
+      return "End date must be in the current pay period.";
+    }
     if (compareIsoDates(end, start) < 0)
       return "End date must be after start date.";
     if (!code.trim()) return "Enter a project code.";
@@ -113,9 +173,17 @@
       id="start-date"
       label="Start date"
       bind:value={startDate}
+      minValue={payPeriodStartDate}
+      maxValue={payPeriodEndDate}
     />
 
-    <DatePickerField id="end-date" label="End date" bind:value={endDate} />
+    <DatePickerField
+      id="end-date"
+      label="End date"
+      bind:value={endDate}
+      minValue={payPeriodStartDate}
+      maxValue={payPeriodEndDate}
+    />
 
     <div class="space-y-1.5">
       <Label for="project-code">Project code</Label>

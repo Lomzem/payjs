@@ -4,6 +4,12 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+const paychexDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
 export function isIsoDate(value: string) {
   return (
     /^\d{4}-\d{2}-\d{2}$/.test(value) &&
@@ -34,6 +40,58 @@ export function getWeekdayIsoDates(startDate: string, endDate: string) {
 export function formatPaychexDateLabel(isoDate: string) {
   // Paychex rows currently display dates like "Jun 8".
   return dateFormatter.format(parseIsoDate(isoDate));
+}
+
+export function parsePaychexPayPeriod(startLabel: string, endLabel: string) {
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentYearStart = parsePaychexDateLabel(startLabel, currentYear);
+  const currentYearEnd = parsePaychexDateLabel(endLabel, currentYear);
+  const todayIso = toIsoDate(today);
+
+  const candidateRanges = [
+    normalizePayPeriod(currentYearStart, currentYearEnd),
+    normalizePayPeriod(
+      parsePaychexDateLabel(startLabel, currentYear - 1),
+      parsePaychexDateLabel(endLabel, currentYear - 1),
+    ),
+    normalizePayPeriod(
+      parsePaychexDateLabel(startLabel, currentYear + 1),
+      parsePaychexDateLabel(endLabel, currentYear + 1),
+    ),
+  ];
+
+  return (
+    candidateRanges.find(
+      (range) =>
+        compareIsoDates(range.startDate, todayIso) <= 0 &&
+        compareIsoDates(todayIso, range.endDate) <= 0,
+    ) ?? candidateRanges[0]
+  );
+}
+
+function normalizePayPeriod(start: Date, end: Date) {
+  if (end < start) {
+    end.setUTCFullYear(end.getUTCFullYear() + 1);
+  }
+
+  return {
+    startDate: toIsoDate(start),
+    endDate: toIsoDate(end),
+  };
+}
+
+function parsePaychexDateLabel(label: string, year: number) {
+  const parsed = new Date(`${label} ${year} 00:00:00 UTC`);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(`Could not parse pay period date: ${label}`);
+  }
+
+  if (paychexDateFormatter.format(parsed) !== label.trim()) {
+    throw new Error(`Could not parse pay period date: ${label}`);
+  }
+
+  return parsed;
 }
 
 function parseIsoDate(isoDate: string) {

@@ -16,13 +16,17 @@
     id: string;
     label: string;
     value: string;
+    minValue?: string;
+    maxValue?: string;
   };
 
-  let { id, label, value = $bindable() }: Props = $props();
+  let { id, label, value = $bindable(), minValue, maxValue }: Props = $props();
 
   const formatter = new DateFormatter("en-US", { dateStyle: "medium" });
   let open = $state(false);
   let calendarValue = $state<DateValue | undefined>(fromIsoDate(value));
+  const calendarMinValue = $derived(fromIsoDate(minValue ?? ""));
+  const calendarMaxValue = $derived(fromIsoDate(maxValue ?? ""));
 
   $effect(() => {
     const nextValue = fromIsoDate(value);
@@ -70,6 +74,8 @@
         type="single"
         initialFocus
         captionLayout="dropdown"
+        minValue={calendarMinValue}
+        maxValue={calendarMaxValue}
         onValueChange={selectDate}
       />
     </Popover.Content>
